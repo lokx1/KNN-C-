@@ -1,7 +1,12 @@
-#include "kDTree.hpp"
-#include "main.hpp"
+#include "ID_BTL2_DSA.hpp"
+
+ofstream OUTPUT;
+
+
 /* TODO: You can implement methods, functions that support your data structures here.
  * */
+
+
 kDTreeNode* kDTree::copy(const kDTreeNode * temp)
 {
     if(temp==nullptr) return nullptr;
@@ -48,7 +53,7 @@ void kDTree::inorderTraversalRec(kDTreeNode *node) const
         
         
           
-        cout << *node << " ";
+        OUTPUT << *node << " ";
         
        
         inorderTraversalRec(node->right);
@@ -67,7 +72,7 @@ void kDTree::preorderTraversalRec(kDTreeNode *node) const
        
        
            
-        cout << *node << " ";
+        OUTPUT << *node << " ";
         
         
         preorderTraversalRec(node->left);
@@ -418,19 +423,7 @@ void kDTree::kNearestNeighbourRec(kDTreeNode *temp, const vector<int> &target, i
         if (!bestList.empty() && d < maxDistance) {
             kNearestNeighbourRec(oppositeBranch, target, k, bestList, level + 1);
         }
-
-        for (int i = 0; i < k-1; i++) {
-            for (int j = i+1; j < k; j++) {
-            if (distanceSquared(target, bestList[i]->data) > distanceSquared(target, bestList[j]->data)) {
-                swap(bestList[i], bestList[j]);
-            }
-            }
-        }
-
-
-
     }
-    
 }
 
 kDTreeNode * kDTree::buildTreeLableRec(const vector<vector<int>> &pointList, const vector<int> &label, int level)
@@ -487,7 +480,7 @@ kDTreeNode * kDTree::buildTreeLableRec(const vector<vector<int>> &pointList, con
 void kDTree::buildTreeLable(const vector<vector<int>> &pointList, const vector<int> &label)
 {   this->count=pointList.size();
     this->root=this->buildTreeLableRec(pointList,label,0);
- 
+
 }
 
 void kDTree::postorderTraversalRec(kDTreeNode *node) const
@@ -498,7 +491,7 @@ void kDTree::postorderTraversalRec(kDTreeNode *node) const
         postorderTraversalRec(node->right);
               
            
-        cout << *node << " ";
+        OUTPUT << *node << " ";
        
        
     
@@ -530,45 +523,43 @@ kDTree::~kDTree()
 void kNN::fit(Dataset &X_train, Dataset &y_train)
 {  
 
-    this->X_train = &X_train;
-    this->y_train = &y_train;
-
-    if (X_train.data.size()) {
-        int chieu = X_train.data.front().size();
-        train.k = chieu;
-        vector<vector<int>> pointList ;
-        pointList.reserve(X_train.data.size());
-        for (const auto& sublist : X_train.data) {
-        vector<int> subVec(sublist.begin(), sublist.end());  // Chuyển đổi list<int> thành vector<int>
-        pointList.push_back(subVec);  // Thêm subVec vào vec chính
-    }
-        vector<int> label;
-        for (auto it = y_train.data.begin(); it != y_train.data.end(); ++it) {
-            if (!it->empty()) {  // Kiểm tra xem vector không rỗng
-                label.push_back(it->front());  // Giả định rằng mỗi vector chỉ chứa một nhãn
-            }
-        }
-        
+    this->X_train=&X_train;
+    this->y_train=&y_train;
+    
+    if(X_train.data.size()){
+        int chieu=X_train.data.front().size();
+        train.k=chieu;
+        vector<vector<int>> pointList = convertListToVector(X_train.data);
+        vector<int> label = convertListToVector(y_train.data).front();
         train.buildTreeLable(pointList, label);
 
     }
-   
+
 }
    
 int mostFrequentLabel(const std::vector<kDTreeNode*>& nodeList) {
-   std::vector<int> labelCount(10, 0);  // Thay đổi giá trị 10 nếu nhãn của bạn có giới hạn khác
- for (const auto& node : nodeList) {
-        if (node != nullptr) {
-            labelCount[node->label]++;  // Tăng số lượng nhãn tương ứng
-        }
-    }
-  
+    if (nodeList.empty()) return -1; // Trả về -1 nếu danh sách rỗng
 
-    int mostFrequent = 0;
-    int maxCount = 0;
-    for (int i = 0; i < labelCount.size(); ++i) {
-        if (labelCount[i] > maxCount) {
-            maxCount = labelCount[i];
+    std::vector<int> labels;
+    for (kDTreeNode* node : nodeList) {
+        labels.push_back(node->label); // Giả sử mỗi node có thuộc tính label
+    }
+
+    int maxLabel = 0;
+    for (int label : labels) {
+        if (label > maxLabel) maxLabel = label;
+    }
+
+    std::vector<int> count(maxLabel + 1, 0); // Khởi tạo mảng đếm
+
+    for (int label : labels) {
+        count[label]++;
+    }
+
+    int mostFrequent = 0, maxCount = 0;
+    for (int i = 0; i <= maxLabel; ++i) {
+        if (count[i] > maxCount) {
+            maxCount = count[i];
             mostFrequent = i;
         }
     }
@@ -579,34 +570,29 @@ int mostFrequentLabel(const std::vector<kDTreeNode*>& nodeList) {
 
 Dataset kNN::predict(Dataset &X_test)
 {
-    Dataset result;
+  Dataset result;
     result.columnName.push_back("label");  // Xác nhận cột cho nhãn
-  
-    vector<vector<int>> testData= convertListToVector(X_test.data);
+
+    vector<vector<int>> testData = convertListToVector(X_test.data);  // Đúng
     vector<int> predictions;
 
+    for (const auto &target : testData) {
+        vector<kDTreeNode*> bestList;
+        train.kNearestNeighbour(target, this->k, bestList);
 
-    for(const auto& target:testData){
-            vector<kDTreeNode*> bestList;
-           
-            train.kNearestNeighbour(target, this->k, bestList);
-           
-            int predictedLabel = mostFrequentLabel(bestList);
-      
-            predictions.push_back(predictedLabel);
-           
-        
+        int predictedLabel = mostFrequentLabel(bestList);
+        predictions.push_back(predictedLabel);
     }
-           
-    for(const auto& label : predictions) {
-        std::list<int> row; // Tạo một list mới cho mỗi nhãn
-        
+
+    // Đảm bảo mỗi nhãn được thêm vào một list<int> mới
+    for (const auto &label : predictions) {
+        list<int> row; // Tạo một list mới cho mỗi nhãn
         row.push_back(label);
         result.data.push_back(row);  // Thêm vào data của result
-        
+    }
 
-    }   
     return result;
+    
 }
 
 double kNN::score(const Dataset &y_test, const Dataset &y_pred)
@@ -633,5 +619,3 @@ double kNN::score(const Dataset &y_test, const Dataset &y_pred)
         if (total == 0) return 0.0; // Kiểm tra chia cho 0
         return static_cast<double>(correctCount) / total;
 }
-
-

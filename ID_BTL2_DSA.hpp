@@ -96,7 +96,7 @@ public:
 };
 
 class kNN
-{   
+{
 private:
     int k;
     Dataset *X_train;
@@ -108,7 +108,16 @@ public:
     void fit(Dataset &X_train, Dataset &y_train);
     Dataset predict(Dataset &X_test);
     double score(const Dataset &y_test, const Dataset &y_pred);
+    void print_Y(const Dataset& y)
+{
+    OUTPUT  << y.columnName[0] << ": ";
+    for (auto it : y.data)
+    {
+        OUTPUT  << it.front() << " ";
+    }
+    OUTPUT << endl;
 
+}
 };
 
 // Please add more or modify as needed

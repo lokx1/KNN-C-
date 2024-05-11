@@ -75,6 +75,9 @@
     "system_error": "cpp",
     "tuple": "cpp",
     "iostream": "cpp",
-    "new": "cpp"
+    "new": "cpp",
+    "array": "cpp",
+    "initializer_list": "cpp",
+    "utility": "cpp"
   }
 }
