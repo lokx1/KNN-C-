@@ -365,22 +365,15 @@ void kDTree::kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNo
     
     kNearestNeighbourRec(root, target, k, bestList, 0);
 }
-kDTreeNode* kDTree::max_element(std::vector<kDTreeNode*> &nodes, const std::vector<int> &target) {
-        if (nodes.empty()) return nullptr;
-
-        kDTreeNode* maxNode = nodes[0];
-        double maxDistance = distanceSquared(target, maxNode->data);
-
-        for (size_t i = 1; i < nodes.size(); ++i) {
-            double currentDistance = distanceSquared(target, nodes[i]->data);
-            if (currentDistance > maxDistance) {
-                maxDistance = currentDistance;
-                maxNode = nodes[i];
-            }
-        }
-
-        return maxNode;
-    } 
+void kDTree::clear(kDTreeNode *node)
+{
+     if (node != nullptr) {
+        clear(node->left);  // Giải phóng nút con bên trái
+        clear(node->right); // Giải phóng nút con bên phải
+        delete node;        // Giải phóng nút hiện tại
+        node = nullptr;     // Đặt lại con trỏ thành nullptr sau khi đã xóa
+    }
+}
 void kDTree::kNearestNeighbourRec(kDTreeNode *temp, const vector<int> &target, int k, vector<kDTreeNode *> &bestList, int level)
 {    if (temp == nullptr) return;  // Nếu node hiện tại là null, dừng việc duyệt
 
@@ -496,17 +489,7 @@ void kDTree::postorderTraversalRec(kDTreeNode *node) const
        
     
 }
-void kDTree::insertSorted(vector<kDTreeNode*>& list, kDTreeNode* node, const vector<int>& target) {
-    int nodeDist = distanceSquared(target, node->data);
-    auto it = list.begin();
-    while (it != list.end() && distanceSquared(target, (*it)->data) < nodeDist) {
-        ++it;
-    }
-    list.insert(it, node);
-    if (list.size() > k) {
-        list.pop_back();  // Giữ lại chỉ `k` phần tử gần nhất
-    }
-}
+
 
 kDTree::kDTree(int k)
 {

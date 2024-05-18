@@ -58,10 +58,9 @@ public:
     const kDTree &operator=(const kDTree &other);
     kDTree(const kDTree &other);
   
-    
+      void clear(kDTreeNode *node);
     int heightRec(kDTreeNode *node) const;
-   
-    void insertSorted(vector<kDTreeNode *> &list, kDTreeNode *node, const vector<int> &target);
+  
     
      void inorderTraversalRec(kDTreeNode *node) const;
     void preorderTraversalRec(kDTreeNode *node) const;
@@ -88,7 +87,7 @@ public:
     void nearestNeighbourRec(kDTreeNode* temp, const vector<int>& target, kDTreeNode* &best, int level);
     void nearestNeighbour(const vector<int> &target, kDTreeNode *&best);
     void kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList);
-   kDTreeNode* max_element(std::vector<kDTreeNode*> &nodes, const std::vector<int> &target);
+
     void kNearestNeighbourRec(kDTreeNode* temp, const vector<int>& target, int k, vector<kDTreeNode*>& bestList, int level);
    kDTreeNode * buildTreeLableRec(const vector<vector<int>> &pointList, const vector<int> &label,int level);
     void buildTreeLable(const vector<vector<int>> &pointList,const vector<int> &label);

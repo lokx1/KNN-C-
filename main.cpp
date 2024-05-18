@@ -1,26 +1,56 @@
 #include "kDTree.hpp"
-
+#include <chrono>
 void tc1()
 {
- kDTree tree(2);
-    tree.insert({5, 6});
-    tree.insert({2, 2});
-    tree.insert({7, 3});
-    tree.insert({2, 8});
-    tree.insert({3, 5});
-    tree.insert({8, 2});
-    tree.insert({8, 7});
-    tree.insert({9, 2});
-    tree.insert({9, 5});
+ kDTree tree(3);
+    tree.insert({1});
+    tree.insert({5});
+    tree.insert({9});
+    tree.insert({2});
+    tree.insert({3});
+    tree.insert({4});
+    tree.insert({5});
+    tree.insert({7});
+    tree.insert({8});
+
     vector<kDTreeNode *> bestList;
-    tree.kNearestNeighbour({9, 3}, 5, bestList);
-    cout << "5 Nearest neighbour of (9, 3) are: ";
+    tree.kNearestNeighbour({2}, 3, bestList);
+    cout << "3 Nearest neighbour of (2) are: ";
     for (auto node : bestList)
     {
         cout << *node << " ";
     }
 }
+void tc8(){kDTree tree(2);
+    tree.insert({1});
+    tree.insert({5});
+    tree.insert({9});
+    tree.insert({2});
+    tree.insert({3});
+    tree.insert({4});
+    tree.insert({5});
+    tree.insert({7});
+    tree.insert({8});
+    vector<kDTreeNode *> bestList;
+    tree.kNearestNeighbour({5}, 10, bestList);
+    
+    for (auto node : bestList)
+    {
+        cout << *node << " ";
+    }}
+    void tc11()
+{
+    kDTree tree(2);
+    vector<vector<int>> pointList = {{10, 5}, {6, 6}, {3, 5}, {7, 9}, {5, 10}, {4, 3}, {7, 10}, {9, 3}, {8,6}, {10,1}, {10,1}, {8,4}, {8,3}, {2,7}, {2,4}};
+    vector<kDTreeNode *> bestList;
 
+    tree.buildTree(pointList);
+    tree.kNearestNeighbour({2,9}, 8, bestList);
+    for (auto node : bestList)
+    {
+        cout << *node << " ";
+    }
+}
 void tc2()
 {
     Dataset dataset;
@@ -100,10 +130,16 @@ void tc5()
     double accuracy = knn.score(y_test, y_pred);
     std::cout << "Accuracy: " << accuracy << endl;
 }
-
+void measureTestCase1Time(){
+    auto start = chrono::high_resolution_clock::now();
+    tc11();
+    auto end = chrono::high_resolution_clock::now();
+   chrono::duration<double> diff = end-start;
+    cout << "Time: " << diff.count() << " s" << endl;
+}
 int main(int argc, const char *argv[])
 {
-    tc4();
-
+    
+    measureTestCase1Time();
     return 0;
 }
